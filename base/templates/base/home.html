@@ -1,0 +1,30 @@
+{% extends 'base/base.html' %}
+{% load i18n %}
+
+{% block title %}
+{% trans "Welcome" %}
+{% endblock title %}
+
+{% block content %}
+<!-- Clean Welcome Section -->
+<div class="text-center py-5 mb-5">
+    <h1 class="display-4 fw-bold mb-3">
+        {% trans "Welcome to Ledger" %}
+    </h1>
+    <p class="lead text-muted mb-4">
+        {% trans "A modern web application built with Django and Bootstrap 5" %}
+    </p>
+    {% if not user.is_authenticated %}
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+        <a href="{% url 'account_signup' %}" class="btn btn-primary btn-lg px-4">
+            {% trans "Get Started" %}
+        </a>
+        <a href="{% url 'account_login' %}" class="btn btn-outline-primary btn-lg px-4">
+            {% trans "Sign In" %}
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+
+{% endblock content %}

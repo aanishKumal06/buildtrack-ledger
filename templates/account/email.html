@@ -1,0 +1,157 @@
+{% extends "account/base_manage.html" %}
+{% load i18n %}
+{% load allauth %}
+
+{% block head_title %}
+    {% trans "Email Addresses" %}
+{% endblock head_title %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-body p-4 p-sm-5">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-envelope text-primary fs-1 mb-3"></i>
+                        <h1 class="fs-2 fw-bold">{% trans "Email Addresses" %}</h1>
+                        <p class="text-muted mb-0">{% trans "Manage your email addresses" %}</p>
+                    </div>
+
+                    {% if emailaddresses %}
+                        <div class="mb-4">
+                            <h5 class="mb-3">{% trans "Your Email Addresses" %}</h5>
+                            {% url 'account_email' as email_url %}
+                            {% element form form=form action=email_url method="post" tags="email,list" %}
+                            {% slot body %}
+                            {% csrf_token %}
+                            <div class="list-group">
+                                {% for radio in emailaddress_radios %}
+                                    {% with emailaddress=radio.emailaddress %}
+                                        <div class="list-group-item d-flex justify-content-between align-items-center border-1 bg-light rounded mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <div class="form-check me-3">
+                                                    {% element field type="radio" checked=radio.checked name="email" value=emailaddress.email id=radio.id %}
+                                                    {% endelement %}
+                                                </div>
+                                                <i class="bi bi-envelope-fill text-primary me-3"></i>
+                                                <div>
+                                                    <div class="fw-semibold">{{ emailaddress.email }}</div>
+                                                    <div class="d-flex gap-2 mt-1">
+                                                        {% if emailaddress.verified %}
+                                                            <span class="badge bg-success">
+                                                                <i class="bi bi-check-circle me-1"></i>{% trans "Verified" %}
+                                                            </span>
+                                                        {% else %}
+                                                            <span class="badge bg-warning">
+                                                                <i class="bi bi-exclamation-triangle me-1"></i>{% trans "Unverified" %}
+                                                            </span>
+                                                        {% endif %}
+                                                        {% if emailaddress.primary %}
+                                                            <span class="badge bg-primary">
+                                                                <i class="bi bi-star me-1"></i>{% trans "Primary" %}
+                                                            </span>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endwith %}
+                                {% endfor %}
+                            </div>
+                            {% endslot %}
+                            {% slot actions %}
+                            <div class="mt-3 d-flex gap-2 flex-wrap">
+                                {% element button type="submit" name="action_primary" class="btn btn-outline-success" %}
+                                <i class="bi bi-star me-1"></i>{% trans "Make Primary" %}
+                                {% endelement %}
+                                {% element button tags="secondary" type="submit" name="action_send" class="btn btn-outline-primary" %}
+                                <i class="bi bi-send me-1"></i>{% trans "Re-send Verification" %}
+                                {% endelement %}
+                                {% element button tags="danger,delete" type="submit" name="action_remove" class="btn btn-outline-danger" %}
+                                <i class="bi bi-trash me-1"></i>{% trans "Remove" %}
+                                {% endelement %}
+                            </div>
+                            {% endslot %}
+                            {% endelement %}
+                        </div>
+                    {% else %}
+                        {% include "account/snippets/warn_no_email.html" %}
+                    {% endif %}
+
+                    {% if can_add_email %}
+                        <!-- Add Email Form -->
+                        <div class="mt-4 pt-4 border-top">
+                            <h5 class="mb-3">{% trans "Add Email Address" %}</h5>
+                            {% url 'account_email' as action_url %}
+                            {% element form form=form method="post" action=action_url tags="email,add" %}
+                            {% slot body %}
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-8 mb-3">
+                                    {% element fields form=form %}
+                                    {% endelement %}
+                                </div>
+                                <div class="col-md-4 mb-3 d-flex align-items-end">
+                                    {% element button name="action_add" type="submit" class="btn btn-primary w-100" %}
+                                    <i class="bi bi-plus-circle me-2"></i>{% trans "Add Email" %}
+                                    {% endelement %}
+                                </div>
+                            </div>
+                            {% endslot %}
+                            {% endelement %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Quick Actions -->
+                    <div class="mt-4 pt-4 border-top text-center">
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <a href="{% url 'account_change_password' %}" class="text-decoration-none">
+                                    <i class="bi bi-shield-lock me-1"></i>
+                                    <small>{% trans "Change Password" %}</small>
+                                </a>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <a href="/" class="text-decoration-none">
+                                    <i class="bi bi-house me-1"></i>
+                                    <small>{% trans "Back to Home" %}</small>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block extra_head %}
+    {{ block.super }}
+    <style>
+        .form-control-lg {
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control-lg:focus {
+            border-color: #0066cc;
+            box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
+        }
+        
+        .list-group-item {
+            transition: all 0.3s ease;
+        }
+        
+        .list-group-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075);
+        }
+        
+        .form-check-input:checked {
+            background-color: #0066cc;
+            border-color: #0066cc;
+        }
+    </style>
+{% endblock %}
