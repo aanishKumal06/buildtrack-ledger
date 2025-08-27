@@ -5,10 +5,6 @@ from django.contrib.auth.models import AbstractUser
 from .managers import CustomUserManager
 # Create your models here.
 
-class roleChoices(models.TextChoices):
-    ADMIN = "ADMIN", "Admin"
-    PROJECT_MANAGER = "PROJECT_MANAGER", "Project Manager"
-    TEAM_MEMBER = "TEAM_MEMBER", "Team Member"
 
 class CustomUser(AbstractUser):
     """
@@ -21,11 +17,6 @@ class CustomUser(AbstractUser):
 
     # This ensures that no two users can register with the same email.
     email = models.EmailField("email address", unique=True)
-    role = models.CharField(
-        max_length=30,
-        choices=roleChoices.choices,
-        default=roleChoices.TEAM_MEMBER,
-    )
 
     # This tells Django to use the 'email' field for authentication instead of 'username'.
     USERNAME_FIELD = "email"

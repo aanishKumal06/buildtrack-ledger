@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("accounts/", include("allauth.urls")),
     path("", include("base.urls")),
+    path("", include("project.urls")),
 ]
 
 urlpatterns += debug_toolbar_urls()

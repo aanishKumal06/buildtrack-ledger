@@ -6,4 +6,5 @@ from django.shortcuts import render
 # Create your views here.
 @login_required()
 def home_view(request):
+
     return render(request, "base/home.html")

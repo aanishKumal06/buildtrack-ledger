@@ -21,7 +21,6 @@ class CustomUserAdmin(ModelAdmin, UserAdmin):
     list_display = [
         "email",
         "first_name",
-        "role",
         "is_staff",
     ]
 
@@ -38,15 +37,7 @@ class CustomUserAdmin(ModelAdmin, UserAdmin):
                 )
             },
         ),
-        (
-            _("Role"),
-            {
-                "fields": (
-                    "role",
-                )
-            }
 
-        ),
         (
             _("Permissions"),
             {
