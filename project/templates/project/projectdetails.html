@@ -1,0 +1,143 @@
+{% extends 'base/base.html' %}
+{% load i18n %}
+
+{% block title %}
+{{ project.name }} - {% trans "Project Details" %}
+{% endblock title %}
+
+{% block content %}
+<div class="row">
+    <!-- Project Overview Card -->
+    <div class="col-12 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-briefcase me-2"></i>{{ project.name }}
+                </h5>
+                <span class="badge bg-light text-primary">{{ project.get_status_display }}</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-person me-2"></i>{% trans "Client" %}</h6>
+                        <p class="mb-3">{{ project.client_name|default:"Not specified" }}</p>
+
+                        <h6><i class="bi bi-calendar me-2"></i>{% trans "Timeline" %}</h6>
+                        <p class="mb-3">{{ project.start_date|date }} - {{ project.end_date|date|default:"Ongoing" }}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-currency-dollar me-2"></i>{% trans "Actual Cost" %}</h6>
+                        <p class="mb-3">{{ project.actual_cost }}</p>
+
+                        <h6><i class="bi bi-card-text me-2"></i>{% trans "Description" %}</h6>
+                        <p class="mb-0">{{ project.description|default:"No description provided" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Members Card -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0"><i class="bi bi-people me-2"></i>{% trans "Team Members" %}</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    {% for member in project.members.all %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-person-circle me-2"></i>
+                            {{ member.user.get_full_name|default:member.user.username }}
+                            <small class="text-muted d-block">{{ member.role }}</small>
+                        </div>
+                        {% if user.is_staff %}
+                        <button class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <p class="text-muted mb-0">{% trans "No team members assigned yet." %}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Budget Lines Card -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0"><i class="bi bi-cash-stack me-2"></i>{% trans "Budget Lines" %}</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>{% trans "Category" %}</th>
+                                <th>{% trans "Amount" %}</th>
+                                <th>{% trans "Assigned To" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for budget in project.budgets.all %}
+                            <tr>
+                                <td>{{ budget.category }}</td>
+                                <td>{{ budget.amount }}</td>
+                                <td>{{ budget.user.get_full_name|default:budget.user.username }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">
+                                    {% trans "No budget lines added yet." %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Milestones Card -->
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0"><i class="bi bi-flag me-2"></i>{% trans "Milestones" %}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    {% for milestone in project.milestones.all %}
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ milestone.name }}</h6>
+                                <p class="text-muted mb-2">
+                                    <i class="bi bi-calendar-event me-2"></i>{{ milestone.due_date|date }}
+                                </p>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar {% if milestone.progress >= 100 %}bg-success{% endif %}"
+                                        role="progressbar" style="width: {{ milestone.progress }}%"
+                                        aria-valuenow="{{ milestone.progress }}" aria-valuemin="0" aria-valuemax="100">
+                                        {{ milestone.progress }}%
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <p class="text-muted mb-0">{% trans "No milestones set yet." %}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
