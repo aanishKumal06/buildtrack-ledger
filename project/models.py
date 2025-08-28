@@ -37,7 +37,22 @@ class Project(AbstractBaseModel):
         total = sum(m.progress for m in milestones)
         return round(total / milestones.count())
 
-    
+    @property
+    def total_income(self):
+        return sum(income.amount for income in self.incomes.all(),Decimal("0.00"))
+
+    @property
+    def total_expense(self):
+        return sum(exp.amount for exp in self.expenses.all(),Decimal("0.00"))
+
+    @property
+    def profit_loss(self):
+        return self.total_income - self.total_expense
+
+    @property
+    def variance(self):
+        return self.actual_cost  - self.total_expense
+
     def clean(self):
         # Validate start_date <= end_date
         if self.end_date and self.start_date > self.end_date:

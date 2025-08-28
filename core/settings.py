@@ -51,6 +51,7 @@ LOCAL_APPS = [
     "base",
     "project",
     "transaction",
+    "milestone",
 ]
 
 THIRD_PARTY_APPS = [

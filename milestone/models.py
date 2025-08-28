@@ -1,10 +1,8 @@
-# milestones/models.py
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from base.models import AbstractBaseModel
-
-from project.models import Project  # adjust 'projects' to your original app name
+from project.models import Project  
 
 class Milestone(AbstractBaseModel):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="milestones")
