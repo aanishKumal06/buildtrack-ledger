@@ -39,11 +39,11 @@ class Project(AbstractBaseModel):
 
     @property
     def total_income(self):
-        return sum(income.amount for income in self.incomes.all(),Decimal("0.00"))
+        return sum((income.amount for income in self.incomes.all()), Decimal("0.00"))
 
     @property
     def total_expense(self):
-        return sum(exp.amount for exp in self.expenses.all(),Decimal("0.00"))
+        return sum((exp.amount for exp in self.expenses.all()), Decimal("0.00"))
 
     @property
     def profit_loss(self):
@@ -58,7 +58,7 @@ class Project(AbstractBaseModel):
         if self.end_date and self.start_date > self.end_date:
             raise ValidationError({'start_date': 'Start date cannot be after end date.'})
 
-        # Optional: Prevent start date in the past
+        # Prevent start date in the past
         if self.start_date < date.today():
             raise ValidationError({'start_date': 'Start date cannot be in the past.'})
 
@@ -71,10 +71,24 @@ class ProjectMember(AbstractBaseModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     role = models.CharField(max_length=50, choices=Role.choices, default=Role.TEAM_MEMBER)
 
-    
     def __str__(self):
         return f"{self.user} {self.role} {self.project}"
 
+    def clean(self):
+        # Check if there is already a Project Manager for this project
+        if self.role == Role.PROJECT_MANAGER:
+            existing_pm = ProjectMember.objects.filter(
+                project=self.project, role=Role.PROJECT_MANAGER
+            )
+            # Exclude self if updating existing record
+            if self.pk:
+                existing_pm = existing_pm.exclude(pk=self.pk)
+            if existing_pm.exists():
+                raise ValidationError("This project already has a Project Manager.")
+
+    def save(self, *args, **kwargs):
+        self.clean()  # validate before saving
+        super().save(*args, **kwargs)
 
     class Meta:
         constraints = [

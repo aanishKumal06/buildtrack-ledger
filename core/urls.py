@@ -23,8 +23,10 @@ from debug_toolbar.toolbar import debug_toolbar_urls
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("accounts/", include("allauth.urls")),
+    path("", include("transaction.urls")),
     path("", include("base.urls")),
     path("", include("project.urls")),
+    path("", include("milestone.urls")),
 ]
 
 urlpatterns += debug_toolbar_urls()

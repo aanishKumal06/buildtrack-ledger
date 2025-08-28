@@ -1,0 +1,188 @@
+{% extends 'base/base.html' %}
+{% load i18n %}
+
+
+{% block content %}
+<div class="container mt-4">
+
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>{{ project.name }}</h2>
+        {% if user.is_staff %}
+        <div>
+            <a href="{% url 'transaction_list' %}" class="btn btn-primary">
+                <i class="bi bi-wallet2"></i> {% trans "View Transaction" %}
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <strong>Client:</strong> {{ project.client_name|default:"N/A" }}
+        </div>
+        <div class="col-md-6">
+            <strong>Status:</strong>
+            <span class="badge 
+                {% if project.status == 'PLANNING' %}bg-secondary{% endif %}
+                {% if project.status == 'ACTIVE' %}bg-primary{% endif %}
+                {% if project.status == 'ON_HOLD' %}bg-warning{% endif %}
+                {% if project.status == 'COMPLETE' %}bg-success{% endif %}
+                {% if project.status == 'CANCELLED' %}bg-danger{% endif %}
+            ">
+                {{ project.get_status_display }}
+            </span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <strong>Start Date:</strong> {{ project.start_date }}
+        </div>
+        <div class="col-md-6">
+            <strong>End Date:</strong> {{ project.end_date|default:"N/A" }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <strong>Description:</strong>
+        <p>{{ project.description|default:"No description available." }}</p>
+    </div>
+
+
+    {% for member in project.members.all %}
+    {% if member.role == 'PROJECT_MANAGER' and member.user == user %}
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <strong>Actual Cost:</strong> Rs. {{ project.actual_cost }}
+            </div>
+            <div class="col-md-4">
+                <strong>Total Income:</strong> Rs. {{ project.total_income }}
+            </div>
+            <div class="col-md-4">
+                <strong>Total Expense:</strong> Rs. {{ project.total_expense }}
+            </div>
+        </div>
+
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <strong>Profit / Loss:</strong> Rs. {{ project.profit_loss }}
+        </div>
+        <div class="col-md-4">
+            <strong>Variance:</strong> Rs. {{ project.variance }}
+        </div>
+            {% endif %}
+    {% endfor %}
+
+    {% if user.is_staff %}
+    <div class="row mb-3">
+                <div class="col-md-4">
+                    <strong>Actual Cost:</strong> Rs. {{ project.actual_cost }}
+                </div>
+                <div class="col-md-4">
+                    <strong>Total Income:</strong> Rs. {{ project.total_income }}
+                </div>
+                <div class="col-md-4">
+                    <strong>Total Expense:</strong> Rs. {{ project.total_expense }}
+                </div>
+            </div>
+
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <strong>Profit / Loss:</strong> Rs. {{ project.profit_loss }}
+            </div>
+            <div class="col-md-4">
+                <strong>Variance:</strong> Rs. {{ project.variance }}
+            </div>
+    {% endif %}
+        <div class="col-md-4">
+            <strong>Overall Progress:</strong> {{ project.overall_progress }}%
+        </div>
+    </div>
+
+    <hr>
+
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Project Members</h3>
+
+    <div>
+            <a href="{% url 'milestone_list_by_project' project.pk %}" class="btn btn-sm btn-outline-secondary me-2">
+                <i class="bi bi-list-check"></i> View milestones
+            </a>
+
+            <a href="{% url 'milestone_create' %}" class="btn btn-sm btn-outline-primary me-2">
+                <i class="bi bi-plus-circle"></i> Add milestones
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Role</th>
+
+            </tr>
+        </thead>
+        <tbody>
+        {% for member in project.members.all %}
+            <tr>
+                <td>{{ member.user.get_full_name|default:member.user.email }}</td>
+                <td>{{ member.get_role_display }}</td>
+
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="{% if user.is_staff %}3{% else %}2{% endif %}" class="text-center">
+                    No members have been added to this project yet.
+                </td>
+            </tr>
+        {% endfor %}
+
+
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-end mb-3">
+        <!-- Edit button for Project Manager -->
+        {% for member in project.members.all %}
+        {% if member.role == 'PROJECT_MANAGER' and member.user == user %}
+        <form method="get" action="{% url 'project_update' project.pk %}" style="display: inline;">
+            <button type="submit" class="btn btn-sm btn-outline-primary me-2">
+                {% trans "Edit" %}
+            </button>
+        </form>
+        {% endif %}
+        {% endfor %}
+
+        <!-- Edit/Delete buttons for Staff -->
+        {% if user.is_staff %}
+
+        <form method="get" action="{% url 'project_member_create'  %}" style="display: inline;">
+            <button type="submit" class="btn btn-sm btn-outline-secondary me-2">
+                {% trans "Add Member" %}
+            </button>
+        </form>
+        <form method="get" action="{% url 'project_update' project.pk %}" style="display: inline;">
+            <button type="submit" class="btn btn-sm btn-outline-primary me-2">
+                {% trans "Update" %}
+            </button>
+        </form>
+        <form method="get" action="{% url 'project_delete' project.pk %}" style="display: inline;">
+            <button type="submit" class="btn btn-sm btn-outline-danger">
+                {% trans "Delete" %}
+            </button>
+        </form>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock content %}

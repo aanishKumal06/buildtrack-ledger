@@ -55,11 +55,11 @@ LOCAL_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    "crispy_forms",
+    "crispy_bootstrap5",
     "debug_toolbar",  # for debugging
     "allauth",  # for user authentication
     "allauth.account",  # for account management
-    "crispy_forms",
-    "crispy_bootstrap5",
 ]
 
 INSTALLED_APPS = THEME_APPS + DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
@@ -70,9 +70,12 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    # Add the debug toolbar middleware:
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     # Add the account middleware:
     "allauth.account.middleware.AccountMiddleware",
+    # Add the messages middleware:
+    'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',

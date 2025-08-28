@@ -6,16 +6,32 @@
 {% endblock title %}
 
 {% block content %}
-<!-- Clean Welcome Section -->
-<div class="text-center py-5 mb-5">
-    <h1 class="display-4 fw-bold mb-3">
-        {% trans "Welcome to Ledger" %}
-    </h1>
-    <p class="lead text-muted mb-4">
-        {% trans "A modern web application built with Django and Bootstrap 5" %}
-    </p>
+<div class="container mt-4">
+
+<div class="text-center ">
+    <h2 class="display-4 fw-bold mb-3">
+        {% trans "Welcome to Accounting System" %}
+    </h2>
+    <p class="lead text-muted mb-5">{% trans "Manage your projects efficiently and keep track of progress." %}</p>
+
+    <!-- Project Overview Chart -->
+        <h2 class="text-center mb-4">{% trans "Project Overview" %}</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <canvas id="projectChart" height="120"></canvas>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{% url 'project_list' %}" class="btn btn-outline-primary btn-lg px-4">
+                {% trans "View All Projects" %}
+            </a>
+        </div>
+
+
+    <!-- Authentication Buttons -->
     {% if not user.is_authenticated %}
-    <div class="d-flex gap-3 justify-content-center flex-wrap">
+    <div class="d-flex gap-3 justify-content-center flex-wrap mt-4">
         <a href="{% url 'account_signup' %}" class="btn btn-primary btn-lg px-4">
             {% trans "Get Started" %}
         </a>
@@ -25,6 +41,43 @@
     </div>
     {% endif %}
 </div>
-
+</div>
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('projectChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ chart_labels|safe }},
+            datasets: [{
+                label: '{% trans "Projects" %}',
+                data: {{ chart_data|safe }},
+                backgroundColor: [
+                    '#0d6efd',
+                    '#198754',
+                    '#ffc107',
+                    '#dc3545',
+                    '#6c757d'
+                ],
+                borderRadius: 8,
+                barThickness: 30
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: { mode: 'index', intersect: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                }
+            }
+        }
+    });
+</script>
 
 {% endblock content %}
